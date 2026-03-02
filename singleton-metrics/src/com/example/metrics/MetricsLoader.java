@@ -5,13 +5,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
- * Loads default metric keys from a properties file.
- *
- * CURRENT STATE (BROKEN ON PURPOSE):
- * - Uses 'new MetricsRegistry()' instead of the singleton.
- *
- * TODO (student):
- *  - Use MetricsRegistry.getInstance() and remove all direct instantiation.
+ * Loads default metric keys from a properties file into the singleton.
  */
 public class MetricsLoader {
 
@@ -21,8 +15,8 @@ public class MetricsLoader {
             props.load(fis);
         }
 
-        // BROKEN: should not create a new instance
-        MetricsRegistry registry = new MetricsRegistry();
+        // ✅ Use the singleton instance
+        MetricsRegistry registry = MetricsRegistry.getInstance();
 
         for (String key : props.stringPropertyNames()) {
             String raw = props.getProperty(key, "0").trim();
