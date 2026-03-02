@@ -3,32 +3,35 @@ import com.example.tickets.TicketService;
 
 import java.util.List;
 
-/**
- * Starter demo that shows why mutability is risky.
- *
- * After refactor:
- * - direct mutation should not compile (no setters)
- * - external modifications to tags should not affect the ticket
- * - service "updates" should return a NEW ticket instance
- */
 public class TryIt {
 
     public static void main(String[] args) {
         TicketService service = new TicketService();
 
-        IncidentTicket t = service.createTicket("TCK-1001", "reporter@example.com", "Payment failing on checkout");
-        System.out.println("Created: " + t);
+        IncidentTicket t1 = service.createTicket(
+                "TCK-1001",
+                "reporter@example.com",
+                "Payment failing on checkout"
+        );
 
-        // Demonstrate post-creation mutation through service
-        service.assign(t, "agent@example.com");
-        service.escalateToCritical(t);
-        System.out.println("\nAfter service mutations: " + t);
+        System.out.println("Created: " + t1);
 
-        // Demonstrate external mutation via leaked list reference
-        List<String> tags = t.getTags();
-        tags.add("HACKED_FROM_OUTSIDE");
-        System.out.println("\nAfter external tag mutation: " + t);
+        // create NEW instances instead of mutating
+        IncidentTicket t2 = service.assign(t1, "agent@example.com");
+        IncidentTicket t3 = service.escalateToCritical(t2);
 
-        // Starter compiles; after refactor, you should redesign updates to create new objects instead.
+        System.out.println("\nOriginal remains unchanged: " + t1);
+        System.out.println("After assign: " + t2);
+        System.out.println("After escalation: " + t3);
+
+        // Try external mutation
+        List<String> tags = t3.getTags();
+        try {
+            tags.add("HACKED_FROM_OUTSIDE");
+        } catch (UnsupportedOperationException e) {
+            System.out.println("\nTags are immutable from outside ✔");
+        }
+
+        System.out.println("\nFinal ticket: " + t3);
     }
 }
